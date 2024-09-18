@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <section class="main-section">
+        <div class="project-header">
+            <h2>Scheduling Algorithm Project</h2>
+        </div>
+        <div class="project-body">
+            <div class="row">
+                <div class="col">
+                    <select id="Algorithm" class="form-control">
+                        <option selected value="FCFS">First Come First Serve (FCFS)</option>
+                        <option value="SJF">Shortest Job First (SJF)</option>
+                        <option value="RRS">Round Robin Scheduling (RRS)</option>
+                        <option value="priority">Priority Scheduling</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <select id="inputState" class="form-control">
+                        <option id="default">Choose...</option>
+                        <option selected value="preemptive" id="preemptive">Preemptive</option>
+                        <option value="non-preemptive" id="non_preemptive">Non-Preemptive</option>
+                    </select>
+                </div>
+            </div>
+
+
+
+            <div class="add-processes-item">
+                <div class="show-process-div">
+                    <div class="Process">
+                        <div class="process-title">
+                            <span>Process Id =></span>
+                        </div>
+                        <div class="input-list" id="ProcessId">
+                        </div>
+                    </div>
+                    <div class="Process" id="arrivalTime">
+                        <div class="process-title">
+                            <span>Arrival Time =></span>
+                        </div>
+                        <div class="input-list" id="ArrivalTime">
+
+                        </div>
+                    </div>
+                    <div class="Process">
+                        <div class="process-title">
+                            <span>Burst Time =></span>
+                        </div>
+                        <div class="input-list" id="BurstTime">
+
+                        </div>
+                    </div>
+                    <div class="Process" id="Quant">
+                        <div class="process-title">
+                            <span> quantum =></span>
+                        </div>
+                        <div class="quantum">
+                            <input type="text" maxlength="2" id="quantum_value">
+                        </div>
+                    </div>
+                    <div class="Process" id="priority">
+                        <div class="process-title">
+                            <span> Priority =></span>
+                        </div>
+                        <div class="input-list" id="Priority">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button id="AddProcessBtn">Add Process</button>
+                    <button id="ClearBtn">Clear</button>
+                    <br>
+                    <button class="calculateBtn" id="CalculateBtn">calculate</button>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="results">
+            <div id="results"></div>
+        </div>
+    </section>
+</body>
+<script>
+    // Add process button click event
+    $("#AddProcessBtn").on("click", function () {
+        // Get all .input-list elements
+        $(".input-list").each(function () {
+            // Create a new input field
+            const newInput = $("<input>", {
+                type: 'text',
+                value: '',
+                maxlength: 2 // Set the maxlength attribute
+            });
+            // Append the new input field to the current .input-list
+            $(this).append(newInput);
+        });
+    });
+
+    // Clear button click event
+    $("#ClearBtn").on("click", function () {
+        // Clear all input fields
+        $(".input-list").empty();
+        $("#results").empty();
+    });
+
+
+</script>
+<script>
+    // function for calculateing FCFS
+    function calculateFCFS(processes, burstTime) {
+        const n = processes.length;
+        let wt = Array(n).fill(0);  // Waiting time array
+        let tat = Array(n).fill(0); // Turnaround time array
+
+        // First process waiting time is 0
+        wt[0] = 0;
+
+        // Calculate waiting time for all processes
+        for (let i = 1; i < n; i++) {
+            wt[i] = wt[i - 1] + burstTime[i - 1];
+        }
+
+        // Calculate turnaround time and the total waiting/turnaround time
+        for (let i = 0; i < n; i++) {
+            tat[i] = wt[i] + burstTime[i];
+        }
+        // Display results
+        displayResults("FCFS", processes, burstTime, wt, tat);
+    }
+
+    // function for calculateing PriorityScheduling
+    function calculatePriority(processes, burstTime, priority) {
+        const n = processes.length;
+        let wt = Array(n).fill(0);  // Waiting time array
+        let tat = Array(n).fill(0); // Turnaround time array
+        let p = [...Array(n).keys()].map(i => i + 1);  // Process IDs (p1, p2, etc.)
+
+        let total_wt = 0, total_tat = 0;
+
+        // Sort processes by priority (higher number = higher priority)
+        for (let i = 0; i < n - 1; i++) {
+            for (let j = i + 1; j < n; j++) {
+                if (priority[i] < priority[j]) {
+                    // Swap priorities
+                    [priority[i], priority[j]] = [priority[j], priority[i]];
+
+                    // Swap burst times
+                    [burstTime[i], burstTime[j]] = [burstTime[j], burstTime[i]];
+
+                    // Swap process IDs
+                    [p[i], p[j]] = [p[j], p[i]];
+                }
+            }
+        }
+
+        // First process has 0 waiting time
+        wt[0] = 0;
+
+        // Calculate waiting time for each process
+        for (let i = 1; i < n; i++) {
+            wt[i] = 0;
+            for (let j = 0; j < i; j++) {
+                wt[i] += burstTime[j];  // Accumulate burst times of previous processes
+            }
+            total_wt += wt[i];  // Total waiting time
+        }
+
+        // Calculate turnaround time for each process
+        for (let i = 0; i < n; i++) {
+            tat[i] = burstTime[i] + wt[i];  // Turnaround time = burst time + waiting time
+            total_tat += tat[i];  // Total turnaround time
+        }
+        // Display the results
+        displayResults("Priority", p, burstTime, wt, tat, null, priority);
+    }
+
+    // function for calculateing RoundRobin
+    function calculateRoundRobin(processes, burstTimes, arrivalTimes, quantum) {
+        const p = processes.length; // Number of processes
+        let remainingProcesses = p; // Number of remaining processes
+        let totalTime = 0; // Total time elapsed
+        let waitingTime = new Array(p).fill(0); // Store waiting time for each process
+        let turnaroundTime = new Array(p).fill(0); // Store turnaround time for each process
+        let temp = [...burstTimes]; // Temporary array to hold remaining burst times
+        let sum = 0; // Time tracker
+        let count = 0; // Flag to mark if process is complete
+
+        // Loop until all processes are done
+        for (let i = 0; remainingProcesses != 0;) {
+            // If remaining burst time is less than or equal to the quantum and greater than 0
+            if (temp[i] <= quantum && temp[i] > 0) {
+                sum += temp[i]; // Add remaining burst time to the total time
+                temp[i] = 0; // Mark process as complete
+                count = 1; // Set flag to indicate process has finished
+
+            } else if (temp[i] > 0) {
+                temp[i] -= quantum; // Reduce the burst time by quantum
+                sum += quantum; // Increment total time by quantum
+            }
+
+            // If the process is finished
+            if (temp[i] === 0 && count === 1) {
+                remainingProcesses--; // Decrease the count of remaining processes
+                // Calculate turnaround time and waiting time for the process
+                turnaroundTime[i] = sum - arrivalTimes[i];
+                waitingTime[i] = turnaroundTime[i] - burstTimes[i];
+                count = 0; // Reset the flag
+            }
+
+            // Move to the next process
+            if (i === p - 1) {
+                i = 0;
+            } else if (arrivalTimes[i + 1] <= sum) {
+                i++;
+            } else {
+                i = 0;
+            }
+        }
+
+        displayResults("Round Robin", processes, burstTimes, waitingTime, turnaroundTime, arrivalTimes);
+    }
+
+    //Shortest Job Next (SJF) is the non preemptive version of Shortest remaining time (SRT)
+    function calculateSJF(processes, burstTime) {
+        const n = processes.length;
+        let wt = Array(n).fill(0);  // Waiting time array
+        let tat = Array(n).fill(0); // Turnaround time array
+        let p = [...Array(n).keys()].map(i => i + 1);  // Process IDs (p1, p2, etc.)
+
+        let total_wt = 0, total_tat = 0;
+
+        // Sort processes by burst time (Shortest Job First)
+        for (let i = 0; i < n - 1; i++) {
+            for (let j = i + 1; j < n; j++) {
+                if (burstTime[i] > burstTime[j]) {
+                    // Swap burst times
+                    [burstTime[i], burstTime[j]] = [burstTime[j], burstTime[i]];
+
+                    // Swap process IDs
+                    [p[i], p[j]] = [p[j], p[i]];
+                }
+            }
+        }
+
+        // First process has 0 waiting time
+        wt[0] = 0;
+
+        // Calculate waiting time for all processes
+        for (let i = 1; i < n; i++) {
+            wt[i] = 0;
+            for (let j = 0; j < i; j++) {
+                wt[i] += burstTime[j];  // Sum burst times of previous processes
+            }
+            total_wt += wt[i];  // Total waiting time
+        }
+
+        // Calculate turnaround time for all processes
+        for (let i = 0; i < n; i++) {
+            tat[i] = burstTime[i] + wt[i];  // Turnaround time = burst time + waiting time
+            total_tat += tat[i];  // Total turnaround time
+        }
+
+        // Display the results
+        displayResults("SJF", p, burstTime, wt, tat, null);
+
+    }
+
+    function displayResults(
+        algorithm,
+        processes,
+        burstTimes,
+        waitingTime,
+        turnaroundTime,
+        arrivalTime = null,
+        priorities = null
+    ) {
+        const resultsDiv = document.getElementById('results');
+        let tableHtml = `<h5>${algorithm} Scheduling</h5>`;
+        tableHtml += '<table border="1" cellpadding="5">';
+        tableHtml += '<thead><tr>';
+        tableHtml += '<th>Process</th>' +
+            (arrivalTime ? '<th>Arrival Time</th>' : '') +
+            '<th>Burst Time</th>' +
+            '<th>Waiting Time</th>' +
+            '<th>Turnaround Time</th>' +
+            (priorities ? '<th>Priority</th>' : '') +
+            '</tr></thead><tbody>';
+
+        let totalWT = 0, totalTAT = 0;
+        for (let i = 0; i < processes.length; i++) {
+            totalWT += waitingTime[i];
+            totalTAT += turnaroundTime[i];
+            tableHtml += `<tr>
+                <td>${processes[i]}</td>` +
+                (arrivalTime ? `<td>${arrivalTime[i]}</td>` : '') +
+                `<td>${burstTimes[i]}</td>
+                <td>${waitingTime[i]}</td>
+                <td>${turnaroundTime[i]}</td>` +
+                (priorities ? `<td>${priorities[i]}</td>` : '') +
+                '</tr>';
+        }
+        tableHtml += '</tbody>';
+        tableHtml += `<tfoot>
+            <tr>
+                <td colspan="${priorities ? 6 : 5}" style="text-align:left"><strong>Average Waiting Time:</strong> ${(totalWT / processes.length).toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td colspan="${priorities ? 6 : 5}" style="text-align:left"><strong>Average Turnaround Time:</strong> ${(totalTAT / processes.length).toFixed(2)}</td>
+            </tr>
+        </tfoot>`;
+        tableHtml += '</table>';
+
+        resultsDiv.innerHTML = tableHtml;
+    }
+
+
+
+    // changeing preemptive and non-preemptive option
+    $("#priority").hide();
+    $("#Quant").hide();
+    $("#arrivalTime").hide();
+    $('#Algorithm').on('change', function () {
+        const selectedValue = $(this).val();
+
+        // Hide all options first
+        $("#Quant").hide();
+        $("#priority").hide();
+
+        // Reset selected state for all options
+        $('#preemptive').prop("selected", false);
+        $('#non_preemptive').prop("selected", false);
+
+        // Handle based on selected algorithm
+        switch (selectedValue) {
+            case 'FCFS':
+                $("#arrivalTime").hide();
+                $('#preemptive').prop("selected", true);
+                break;
+            case 'RRS':
+                $("#Quant").show();
+                $("#arrivalTime").show();
+                $('#default').prop("selected", true);
+                break;
+            case 'priority':
+                $("#priority").show();
+                $('#default').prop("selected", true);
+                break;
+            case 'SJF':
+                $('#non_preemptive').prop("selected", true);
+                $("#arrivalTime").hide();
+                break;
+        }
+    });
+
+
+    // Add Calculate button click event
+    $("#CalculateBtn").on("click", function () {
+        // Get all input fields from .input-list elements
+        const AllProcessId = $("#ProcessId input");
+        const AllArrivalTime = $("#ArrivalTime input");
+        const AllBurstTime = $("#BurstTime input");
+        const AllPriority = $("#Priority input");
+
+        let AllProcessValue = [];
+        let AllArrivalTimeValue = [];
+        let AllBurstTimeValue = [];
+        let AllPriorityvalue = [];
+
+        // Loop through all input fields and store their values in the array
+        AllProcessId.each(function () {
+            if ($(this).val()) {
+                AllProcessValue.push(parseInt($(this).val()));
+            }
+        });
+
+        AllArrivalTime.each(function () {
+            if ($(this).val()) {
+                AllArrivalTimeValue.push(parseInt($(this).val()));
+            }
+        });
+
+        AllBurstTime.each(function () {
+            if ($(this).val()) {
+                AllBurstTimeValue.push(parseInt($(this).val()));
+            }
+        });
+        AllPriority.each(function () {
+            if ($(this).val()) {
+                AllPriorityvalue.push(parseInt($(this).val()));
+            }
+        });
+
+        const Algorithm = $("#Algorithm").val();
+        const quantum_value = parseInt($("#quantum_value").val());
+
+        if (Algorithm === "FCFS") {
+            calculateFCFS(AllProcessValue, AllBurstTimeValue);
+        } else if (Algorithm === "RRS") {
+            calculateRoundRobin(AllProcessValue, AllBurstTimeValue, AllArrivalTimeValue, quantum_value);
+        } else if (Algorithm === "SJF") {
+            calculateSJF(AllProcessValue, AllBurstTimeValue, AllArrivalTimeValue);
+        } else if (Algorithm === "priority") {
+            calculatePriority(AllProcessValue, AllBurstTimeValue, AllPriorityvalue);
+        }
+        else if (Algorithm === "SRTF") {
+            calculateSRT(AllProcessValue, AllBurstTimeValue, AllArrivalTimeValue);
+        }
+    });
+
+
+
+</script>
+
+</html>

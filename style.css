@@ -1,0 +1,113 @@
+@media screen and (min-width:790px) {
+    .main-section {
+        margin:1% 10%;
+    }
+}
+body {
+    background-color: azure;
+}
+.main-section{
+
+    margin-bottom: 50px;
+    padding: 10px;
+    -webkit-box-shadow: 0px 1px 25px -5px rgba(166, 159, 166, 1);
+    -moz-box-shadow: 0px 1px 25px -5px rgba(166, 159, 166, 1);
+    box-shadow: 0px 1px 25px -5px rgba(166, 159, 166, 1);
+    border-radius: 10px;  
+}
+#results{
+    margin-bottom: 50px;
+}
+.project-header h2 {
+    text-align: center;
+    margin: 30px;
+}
+
+.select-option {
+    padding: 10px;
+    display: flex;
+    background-color: rgb(179, 203, 219);
+    align-items: center;
+}
+
+
+.select-option select {
+    padding: 10px;
+    border-radius: 10px;
+    outline: none;
+    border: 1px solid #ffff;
+}
+
+.select-option option {
+    padding: 10px;
+}
+
+.add-processes-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px;
+}
+
+.input-list input,
+.quantum input {
+    width: 30px;
+    height: 30px;
+    margin-left: 10px;
+    text-align: center;
+    outline: none;
+}
+
+.Process .input-list {
+    margin-left: 24px;
+}
+
+.process-title span {
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.Process {
+    display: flex;
+    gap: 10px;
+    margin: 25px 0;
+    align-items: center;
+
+}
+
+.buttons button {
+    border: 1px solid #c2c2c2;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin: 10px 0;
+}
+
+.buttons .calculateBtn {
+    width: 170px;
+}
+
+.hide {
+    display: none;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+.process-title{
+    width: 140px;
+}
+.quantum{
+    margin-left: 25px;
+}
