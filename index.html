@@ -29,8 +29,8 @@
                 <div class="col">
                     <select id="inputState" class="form-control">
                         <option id="default">Choose...</option>
-                        <option selected value="preemptive" id="preemptive">Preemptive</option>
-                        <option value="non-preemptive" id="non_preemptive">Non-Preemptive</option>
+                        <option  value="preemptive" id="preemptive">Preemptive</option>
+                        <option selected value="non-preemptive" id="non_preemptive">Non-Preemptive</option>
                     </select>
                 </div>
             </div>
@@ -140,6 +140,7 @@
         // Display results
         displayResults("FCFS", processes, burstTime, wt, tat);
     }
++
 
     // function for calculateing PriorityScheduling
     function calculatePriority(processes, burstTime, priority) {
@@ -328,6 +329,9 @@
 
 
 
+
+
+
     // changeing preemptive and non-preemptive option
     $("#priority").hide();
     $("#Quant").hide();
@@ -346,8 +350,8 @@
         // Handle based on selected algorithm
         switch (selectedValue) {
             case 'FCFS':
+                $('#non_preemptive').prop("selected", true);
                 $("#arrivalTime").hide();
-                $('#preemptive').prop("selected", true);
                 break;
             case 'RRS':
                 $("#Quant").show();
